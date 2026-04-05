@@ -1,0 +1,22 @@
+# Build output
+/target/
+/dist/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vs/
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Node
+node_modules/
+
+# Temporary files
+*.tmp
+*.temp
+*.pdb

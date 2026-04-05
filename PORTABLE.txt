@@ -1,0 +1,14 @@
+Clock Widget (portable build for Windows 11)
+
+How to run:
+1) Unzip to any folder
+2) Run ClockWidget.exe
+
+If it doesn't start:
+- WebView2 Runtime is required (usually already installed on Windows 11)
+- Microsoft Visual C++ Redistributable (x64) may be required
+
+Notes:
+- This is a portable build (no installer). To auto-start with Windows: Win+R -> shell:startup and add a shortcut.
+- Settings (12/24h, seconds, time zone) are stored locally by the app.
+
