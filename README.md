@@ -2,6 +2,9 @@
 
 Небольшой виджет часов для Windows 11, сделанный на Tauri.
 
+<img width="300" height="600" alt="123" src="https://github.com/user-attachments/assets/23f9cf58-e395-43e1-9a6f-e34ddee02c58" />
+
+
 Идея была простой: сделать аккуратные часы, которые не перегружают рабочий стол, нормально выглядят на нескольких мониторах и не разваливаются от банальных вещей вроде смены DPI или перетаскивания между экранами.
 
 Сейчас в проекте есть:
@@ -74,14 +77,6 @@ npx.cmd tauri build --bundles msi
 - `tauri.conf.json` — конфиг приложения и сборки
 - `scripts/` — вспомогательные скрипты
 
-## Публикация
-
-Если выкладывать проект в публичный Git:
-
-- не коммить `target/`
-- не коммить `dist/`
-- не держи в репозитории временные `.exe` из локальных сборок
-- релизный артефакт лучше выкладывать через GitHub Releases, а не хранить в репо
 
 ## Лицензия
 
@@ -162,15 +157,6 @@ The most important files are:
 - `src/main.rs` — Tauri bootstrap and DPI-related window guards
 - `tauri.conf.json` — app and bundling config
 - `scripts/` — helper scripts
-
-## Publishing notes
-
-If you plan to publish this repo:
-
-- do not commit `target/`
-- do not commit `dist/`
-- do not keep temporary local build `.exe` files in the repo
-- publish release artifacts through GitHub Releases instead of storing them in source control
 
 ## License
 
