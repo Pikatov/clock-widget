@@ -23,7 +23,7 @@
 
 ### Файлы релиза
 
-- `Clock Widget_2.0.0_x64_en-US.msi`
+- `Clock.Widget_2.0.0_x64_en-US.msi`
 - `ClockWidget-2.0.0-portable-win11.zip`
 
 ## English
@@ -49,5 +49,5 @@ If you already used version `1.0.0`, widget settings should remain in the local 
 
 ### Release Files
 
-- `Clock Widget_2.0.0_x64_en-US.msi`
+- `Clock.Widget_2.0.0_x64_en-US.msi`
 - `ClockWidget-2.0.0-portable-win11.zip`
