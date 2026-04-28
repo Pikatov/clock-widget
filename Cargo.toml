@@ -1,10 +1,11 @@
 [package]
 name = "clock-widget"
-version = "1.0.0"
+version = "2.0.0"
 description = "macOS-style clock widget for Windows 11"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
+repository = "https://github.com/Pikatov/clock-widget"
 
 [build-dependencies]
 tauri-build = { version = "1", features = [] }

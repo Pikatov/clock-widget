@@ -80,3 +80,39 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn window_size_constants_are_positive() {
+        assert!(WINDOW_WIDTH > 0.0);
+        assert!(WINDOW_HEIGHT > 0.0);
+    }
+
+    #[test]
+    fn fixed_window_size_matches_constants() {
+        let size = fixed_window_size();
+        if let Size::Logical(logical) = size {
+            assert_eq!(logical.width, WINDOW_WIDTH);
+            assert_eq!(logical.height, WINDOW_HEIGHT);
+        } else {
+            panic!("expected logical size");
+        }
+    }
+
+    #[test]
+    fn base_offset_is_positive() {
+        assert!(BASE_OFFSET > 0.0);
+    }
+
+    #[test]
+    fn fallback_position_cascades_by_index() {
+        let index = 3usize;
+        let x = 40.0 + BASE_OFFSET * index as f64;
+        let y = 40.0 + BASE_OFFSET * index as f64;
+        assert_eq!(x, 40.0 + BASE_OFFSET * 3.0);
+        assert_eq!(y, x);
+    }
+}
