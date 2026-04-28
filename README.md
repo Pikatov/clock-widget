@@ -1,52 +1,72 @@
 # Clock Widget
 
-Небольшой виджет часов для Windows 11, сделанный на Tauri.
+Небольшой desktop-виджет часов для Windows 11, сделанный на Tauri.
 
-<img width="300" height="600" alt="123" src="https://github.com/user-attachments/assets/23f9cf58-e395-43e1-9a6f-e34ddee02c58" />
+<img width="300" height="600" alt="Clock Widget preview" src="https://github.com/user-attachments/assets/23f9cf58-e395-43e1-9a6f-e34ddee02c58" />
 
 Текущая версия: `2.0.0`.
 
-Релизные заметки на русском и английском: [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Релизные заметки: [RELEASE_NOTES.md](RELEASE_NOTES.md).
 
-Идея была простой: сделать аккуратные часы, которые не перегружают рабочий стол, нормально выглядят на нескольких мониторах и не разваливаются от банальных вещей вроде смены DPI или перетаскивания между экранами.
+## Что это
 
-Сейчас в проекте есть:
-- несколько независимых виджетов
+Clock Widget показывает аккуратные часы в отдельном прозрачном окне. Виджет можно держать поверх остальных окон, переносить между мониторами, закреплять на месте и запускать несколько независимых экземпляров с разными настройками.
+
+Приложение не использует аккаунты, синхронизацию или внешние сервисы. Настройки каждого окна хранятся локально в WebView.
+
+## Возможности
+
+- несколько независимых окон-виджетов
 - отдельная таймзона для каждого окна
-- три визуальных стиля
-- `always on top`
-- 12/24h формат
-- показ или скрытие секунд
-- свободное перетаскивание между экранами
-- `Pin`, если нужно зафиксировать виджет на месте
+- поиск таймзоны по городу или IANA-имени
+- три визуальных режима: `Classic dark`, `Light theme`, `Text only`
+- режимы `Always on top` и `Pin widget`
+- переключение секунд
+- 12/24-часовой формат
+- перетаскивание по рабочему столу
+- фиксированный размер окна при смене DPI и переносе между мониторами
 
-## Что это за проект
+## Управление
 
-Clock Widget это маленькое desktop-приложение без лишней сложности. Каждый виджет живёт в своём окне и хранит настройки локально. Никакой синхронизации, аккаунтов или внешних сервисов тут нет.
+- Перетащить виджет: зажать левую кнопку мыши на часах.
+- Открыть меню: правый клик по окну.
+- Выбрать таймзону: пункт `Time zone...` или клик по бейджу таймзоны.
+- Создать ещё один виджет: `Add widget`.
+- Закрепить окно на месте: `Pin widget`.
+- Держать поверх окон: `Always on top`.
 
-Контекстное меню позволяет быстро поменять стиль, таймзону и поведение окна. Основной сценарий довольно простой: поставил часы на нужный экран, выбрал оформление и больше не трогаешь, пока не захочется что-то переставить.
+## Установка
+
+Готовые сборки публикуются в GitHub Releases:
+
+- MSI-установщик: `Clock Widget_2.0.0_x64_en-US.msi`
+- portable-архив: `ClockWidget-2.0.0-portable-win11.zip`
+
+Portable-версия не требует установки: распакуй архив и запусти `ClockWidget.exe`.
+
+## Автозапуск с Windows
+
+1. Установи приложение или распакуй portable-версию в постоянную папку.
+2. Нажми `Win + R`.
+3. Введи `shell:startup` и нажми Enter.
+4. Добавь ярлык на `Clock Widget.exe` или `ClockWidget.exe`.
 
 ## Локальный запуск
-
-Если хочешь просто запустить проект локально:
 
 ```powershell
 cargo run
 ```
 
-## Сборка релизных файлов
+## Сборка
 
-Для полной сборки GitHub release assets на Windows:
+Для полной сборки release assets на Windows:
 
 ```powershell
 cargo install tauri-cli --version "^1" --locked
 .\scripts\build-release-assets.ps1
 ```
 
-Готовые файлы появятся в `dist/`:
-
-- `Clock Widget_2.0.0_x64_en-US.msi`
-- `ClockWidget-2.0.0-portable-win11.zip`
+Скрипт собирает MSI и portable ZIP в `dist/`.
 
 Если нужен только MSI:
 
@@ -54,134 +74,153 @@ cargo install tauri-cli --version "^1" --locked
 cargo tauri build --bundles msi
 ```
 
-## Автозапуск с Windows
+Если нужен только portable ZIP:
 
-Если хочешь, чтобы виджет запускался автоматически после входа в Windows:
+```powershell
+.\scripts\build-portable-zip.ps1
+```
 
-1. Установи приложение или выбери постоянный путь к `.exe`.
-2. Нажми `Win + R`.
-3. Введи `shell:startup` и нажми Enter.
-4. В открывшейся папке создай ярлык на `Clock Widget.exe`.
-
-Практический совет:
-
-- лучше создавать ярлык на установленную версию приложения, а не на временный файл из `target/`
-- если собрал MSI, после установки удобнее использовать ярлык или `.exe` из установленной директории
-- всё, что лежит в папке автозагрузки, будет запускаться при каждом входе в систему
-
-## Требования
-
-Для локальной разработки нужны:
+## Требования для разработки
 
 - Windows 11
 - Rust toolchain
-- Tauri CLI
+- Tauri CLI 1.x
 - Microsoft Edge WebView2 Runtime
 - Visual Studio Build Tools 2022 с C++ workload
+- WiX Toolset для MSI-сборки
 
 ## Структура проекта
 
-Самое важное находится здесь:
+- `src/index.html` - разметка окна и меню.
+- `src/styles.css` - стили виджета, меню и выбора таймзоны.
+- `src/app.js` - состояние окна, часы, таймзоны и обработчики меню.
+- `src/main.rs` - Tauri bootstrap, создание окон и защита размера при DPI changes.
+- `scripts/build-release-assets.ps1` - сборка MSI и portable ZIP.
+- `scripts/build-portable-zip.ps1` - сборка portable ZIP.
+- `.github/workflows/release.yml` - сборка и публикация assets для GitHub Releases.
 
-- `src/index.html` — интерфейс, стили и контекстное меню
-- `src/main.rs` — инициализация Tauri-окна и защита от DPI-сюрпризов
-- `tauri.conf.json` — конфиг приложения и сборки
-- `scripts/` — вспомогательные скрипты
-- `.github/workflows/release.yml` — сборка release assets для GitHub Releases
+## Публикация релиза
 
+1. Обновить версию в `Cargo.toml` и `tauri.conf.json`.
+2. Обновить `README.md` и `RELEASE_NOTES.md`.
+3. Создать tag формата `v2.0.0`.
+4. Запушить `main` и tag на GitHub.
 
-## Лицензия
+GitHub Actions соберёт Windows assets и прикрепит их к GitHub Release.
 
-MIT, подробнее в [LICENSE](LICENSE).
+## License
+
+MIT. See [LICENSE](LICENSE).
 
 ---
 
 ## English
 
-Small desktop clock widget for Windows 11, built with Tauri.
+Small Windows 11 desktop clock widget built with Tauri.
 
 Current version: `2.0.0`.
 
-Release notes in Russian and English: [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Release notes: [RELEASE_NOTES.md](RELEASE_NOTES.md).
 
-The goal of this project was pretty simple: make a clean clock widget that looks good on the desktop, behaves well across multiple monitors, and does not fall apart when DPI scaling changes or the window is dragged between screens.
+## What It Is
 
-Current features:
-- multiple independent widgets
+Clock Widget shows a clean clock in a separate transparent desktop window. You can keep it above other windows, move it across monitors, pin it in place, and create multiple independent widgets with separate settings.
+
+The app does not use accounts, sync, or external services. Per-window settings are stored locally in the WebView.
+
+## Features
+
+- multiple independent widget windows
 - per-window time zone
-- three visual styles
-- `always on top`
-- 12/24h format
+- time zone search by city or IANA name
+- three visual modes: `Classic dark`, `Light theme`, `Text only`
+- `Always on top` and `Pin widget` modes
 - optional seconds
-- free dragging across monitors
-- `Pin` mode when you want to lock a widget in place
+- 12/24-hour format
+- desktop dragging
+- fixed window size across DPI changes and monitor moves
 
-## What this project is
+## Controls
 
-Clock Widget is a small desktop app without unnecessary complexity. Each widget lives in its own window and stores its settings locally. No accounts, no sync, no external services.
+- Drag the widget: hold the left mouse button on the clock.
+- Open the menu: right-click the window.
+- Pick a time zone: use `Time zone...` or click the time zone badge.
+- Create another widget: `Add widget`.
+- Lock the widget in place: `Pin widget`.
+- Keep it above other windows: `Always on top`.
 
-The context menu is the main control surface. You can change the style, switch the time zone, or pin the widget in place without digging through settings screens.
+## Installation
 
-## Run locally
+Ready builds are published through GitHub Releases:
+
+- MSI installer: `Clock Widget_2.0.0_x64_en-US.msi`
+- portable archive: `ClockWidget-2.0.0-portable-win11.zip`
+
+The portable build does not require installation: unzip it and run `ClockWidget.exe`.
+
+## Start With Windows
+
+1. Install the app or unzip the portable build to a permanent folder.
+2. Press `Win + R`.
+3. Type `shell:startup` and press Enter.
+4. Add a shortcut to `Clock Widget.exe` or `ClockWidget.exe`.
+
+## Run Locally
 
 ```powershell
 cargo run
 ```
 
-## Build release files
+## Build
 
-To build the full GitHub release assets on Windows:
+To build the full release assets on Windows:
 
 ```powershell
 cargo install tauri-cli --version "^1" --locked
 .\scripts\build-release-assets.ps1
 ```
 
-Generated files will be placed in `dist/`:
+The script creates the MSI and portable ZIP in `dist/`.
 
-- `Clock Widget_2.0.0_x64_en-US.msi`
-- `ClockWidget-2.0.0-portable-win11.zip`
-
-If you only need the MSI installer:
+If you only need the MSI:
 
 ```powershell
 cargo tauri build --bundles msi
 ```
 
-## Start with Windows
+If you only need the portable ZIP:
 
-If you want the widget to launch automatically when you sign in to Windows:
+```powershell
+.\scripts\build-portable-zip.ps1
+```
 
-1. Install the app or choose a permanent `.exe` location.
-2. Press `Win + R`.
-3. Type `shell:startup` and press Enter.
-4. Create a shortcut to `Clock Widget.exe` in that folder.
-
-Practical notes:
-
-- it is better to create the shortcut to the installed app, not to a temporary build inside `target/`
-- if you built an MSI, use the installed app path or shortcut after installation
-- everything inside the Startup folder will launch automatically at sign-in
-
-## Requirements
-
-To work on the project locally, you will need:
+## Development Requirements
 
 - Windows 11
 - Rust toolchain
-- Tauri CLI
+- Tauri CLI 1.x
 - Microsoft Edge WebView2 Runtime
 - Visual Studio Build Tools 2022 with the C++ workload
+- WiX Toolset for MSI builds
 
-## Project layout
+## Project Layout
 
-The most important files are:
+- `src/index.html` - window and menu markup.
+- `src/styles.css` - widget, menu, and time zone picker styles.
+- `src/app.js` - window state, clock, time zones, and menu handlers.
+- `src/main.rs` - Tauri bootstrap, window creation, and DPI size guards.
+- `scripts/build-release-assets.ps1` - builds the MSI and portable ZIP.
+- `scripts/build-portable-zip.ps1` - builds the portable ZIP.
+- `.github/workflows/release.yml` - builds and publishes GitHub Release assets.
 
-- `src/index.html` — UI, styles, and context menu logic
-- `src/main.rs` — Tauri bootstrap and DPI-related window guards
-- `tauri.conf.json` — app and bundling config
-- `scripts/` — helper scripts
-- `.github/workflows/release.yml` — GitHub Releases asset build
+## Release Publishing
+
+1. Update the version in `Cargo.toml` and `tauri.conf.json`.
+2. Update `README.md` and `RELEASE_NOTES.md`.
+3. Create a tag such as `v2.0.0`.
+4. Push `main` and the tag to GitHub.
+
+GitHub Actions will build the Windows assets and attach them to the GitHub Release.
 
 ## License
 

@@ -2,48 +2,52 @@
 
 ## Русский
 
-Clock Widget 2.0.0 - крупное обновление виджета часов для Windows 11.
+Версия `2.0.0` - технический релиз, который подготавливает проект к нормальной публикации через GitHub Releases. Пользовательские возможности из `1.0.0` сохранены, а основная работа сделана вокруг структуры проекта, сборки и поддержки релизов.
 
-Что нового:
+### Что изменилось после 1.0.0
 
-- Добавлены несколько независимых окон-виджетов.
-- Для каждого окна можно выбрать свою таймзону.
-- Добавлены три визуальных режима: Classic dark, Light theme и Text only.
-- Добавлены режимы `Always on top` и `Pin widget`.
-- Добавлены переключатели секунд и 12/24-часового формата.
-- Улучшена работа окна при смене DPI и переносе между мониторами.
-- Подготовлены release assets: MSI-установщик и portable ZIP.
+- Разделён монолитный `src/index.html`: стили вынесены в `src/styles.css`, логика окна и меню - в `src/app.js`.
+- Обновлены метаданные пакета до `2.0.0`, добавлена ссылка на репозиторий в `Cargo.toml`.
+- Добавлен скрипт `scripts/build-release-assets.ps1`, который собирает MSI и portable ZIP в `dist/`.
+- Добавлен GitHub Actions workflow для сборки Windows assets и публикации их в GitHub Release.
+- Расширен `.gitignore`: build output, release artifacts, local preview files, package-manager cache, env/log/temp файлы.
+- Portable ZIP теперь включает `LICENSE.txt`.
+- В сборочных PowerShell-скриптах добавлена явная проверка exit code после native-команд.
+- Добавлены базовые Rust-тесты для констант и helper-логики фиксированного размера окна.
+- Локальный `src/preview.html` убран из исходников релиза и добавлен в ignore.
+- Обновлён README: актуальная структура файлов, команды сборки, установка, управление и публикация релиза.
 
-Требования:
+### Для пользователей
 
-- Windows 11.
-- Microsoft Edge WebView2 Runtime.
+Если у тебя уже была версия `1.0.0`, настройки виджетов должны остаться локально в WebView. Формат пользовательских настроек не менялся.
 
-Файлы релиза:
+### Файлы релиза
 
-- `Clock Widget_2.0.0_x64_en-US.msi` - установщик.
-- `ClockWidget-2.0.0-portable-win11.zip` - portable-версия без установки.
+- `Clock Widget_2.0.0_x64_en-US.msi`
+- `ClockWidget-2.0.0-portable-win11.zip`
 
 ## English
 
-Clock Widget 2.0.0 is a major update of the Windows 11 desktop clock widget.
+Version `2.0.0` is a technical release that prepares the project for proper GitHub Releases publishing. User-facing features from `1.0.0` remain in place; most of the work is in project structure, build scripts, and release maintenance.
 
-What's new:
+### What Changed Since 1.0.0
 
-- Added multiple independent widget windows.
-- Added per-window time zone selection.
-- Added three visual modes: Classic dark, Light theme, and Text only.
-- Added `Always on top` and `Pin widget` modes.
-- Added optional seconds and 12/24-hour time format toggles.
-- Improved window behavior when DPI changes or the widget moves between monitors.
-- Prepared release assets: MSI installer and portable ZIP.
+- Split the monolithic `src/index.html`: styles now live in `src/styles.css`, window/menu logic now lives in `src/app.js`.
+- Updated package metadata to `2.0.0` and added the repository URL to `Cargo.toml`.
+- Added `scripts/build-release-assets.ps1` to build both the MSI and portable ZIP into `dist/`.
+- Added a GitHub Actions workflow for building Windows assets and publishing them to GitHub Releases.
+- Expanded `.gitignore` for build output, release artifacts, local preview files, package-manager cache, env/log/temp files.
+- Portable ZIP now includes `LICENSE.txt`.
+- Build PowerShell scripts now check native command exit codes explicitly.
+- Added basic Rust tests for fixed-size window constants and helper logic.
+- Removed the local `src/preview.html` file from release sources and added it to ignore.
+- Updated README with the current file layout, build commands, installation notes, controls, and release publishing flow.
 
-Requirements:
+### For Users
 
-- Windows 11.
-- Microsoft Edge WebView2 Runtime.
+If you already used version `1.0.0`, widget settings should remain in the local WebView storage. The user settings format did not change.
 
-Release files:
+### Release Files
 
-- `Clock Widget_2.0.0_x64_en-US.msi` - installer.
-- `ClockWidget-2.0.0-portable-win11.zip` - portable build without installation.
+- `Clock Widget_2.0.0_x64_en-US.msi`
+- `ClockWidget-2.0.0-portable-win11.zip`
