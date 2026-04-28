@@ -2,8 +2,6 @@
 
 Небольшой desktop-виджет часов для Windows 11, сделанный на Tauri.
 
-<img width="300" height="600" alt="Clock Widget preview" src="https://github.com/user-attachments/assets/23f9cf58-e395-43e1-9a6f-e34ddee02c58" />
-
 Текущая версия: `2.0.0`.
 
 Релизные заметки: [RELEASE_NOTES.md](RELEASE_NOTES.md).
