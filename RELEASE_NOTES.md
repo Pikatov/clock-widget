@@ -6,6 +6,8 @@
 
 ### Что изменилось после 1.0.0
 
+- Убраны внешние тени вокруг виджета во всех визуальных режимах.
+- Размер окна теперь фиксируется в физических пикселях, чтобы при переносе между мониторами с разным DPI/разрешением виджет не пересчитывался в другой размер.
 - Разделён монолитный `src/index.html`: стили вынесены в `src/styles.css`, логика окна и меню - в `src/app.js`.
 - Обновлены метаданные пакета до `2.0.0`, добавлена ссылка на репозиторий в `Cargo.toml`.
 - Добавлен скрипт `scripts/build-release-assets.ps1`, который собирает MSI и portable ZIP в `dist/`.
@@ -32,6 +34,8 @@ Version `2.0.0` is a technical release that prepares the project for proper GitH
 
 ### What Changed Since 1.0.0
 
+- Removed outer widget shadows in all visual modes.
+- The window size is now fixed in physical pixels so moving the widget between monitors with different DPI/resolution does not resize it.
 - Split the monolithic `src/index.html`: styles now live in `src/styles.css`, window/menu logic now lives in `src/app.js`.
 - Updated package metadata to `2.0.0` and added the repository URL to `Cargo.toml`.
 - Added `scripts/build-release-assets.ps1` to build both the MSI and portable ZIP into `dist/`.

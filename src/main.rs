@@ -1,13 +1,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{AppHandle, LogicalSize, Manager, Size, Window, WindowBuilder, WindowEvent, WindowUrl};
+use tauri::{
+    AppHandle, Manager, PhysicalSize, Size, Window, WindowBuilder, WindowEvent, WindowUrl,
+};
 
-const WINDOW_WIDTH: f64 = 336.0;
-const WINDOW_HEIGHT: f64 = 296.0;
+const WINDOW_WIDTH: u32 = 336;
+const WINDOW_HEIGHT: u32 = 296;
 const BASE_OFFSET: f64 = 28.0;
 
 fn fixed_window_size() -> Size {
-    Size::Logical(LogicalSize::new(WINDOW_WIDTH, WINDOW_HEIGHT))
+    Size::Physical(PhysicalSize::new(WINDOW_WIDTH, WINDOW_HEIGHT))
 }
 
 fn apply_fixed_window_size(window: &Window) {
@@ -30,14 +32,19 @@ fn attach_window_guards(window: &Window) {
 
 #[tauri::command]
 fn create_widget(app: AppHandle, window: Window) -> Result<String, String> {
-    let next_index = app.windows().len() + 1;
-    let label = format!("widget-{next_index}");
+    let mut next_index = app.windows().len() + 1;
+    let label = loop {
+        let candidate = format!("widget-{next_index}");
+        if app.get_window(&candidate).is_none() {
+            break candidate;
+        }
+        next_index += 1;
+    };
 
-    if app.get_window(&label).is_some() {
-        return Err("widget label already exists".into());
-    }
-
-    let (mut x, mut y) = (40.0 + BASE_OFFSET * next_index as f64, 40.0 + BASE_OFFSET * next_index as f64);
+    let (mut x, mut y) = (
+        40.0 + BASE_OFFSET * next_index as f64,
+        40.0 + BASE_OFFSET * next_index as f64,
+    );
 
     if let Ok(position) = window.outer_position() {
         x = position.x as f64 + BASE_OFFSET;
@@ -46,7 +53,7 @@ fn create_widget(app: AppHandle, window: Window) -> Result<String, String> {
 
     let window = WindowBuilder::new(&app, label.clone(), WindowUrl::App("index.html".into()))
         .title("Clock Widget")
-        .inner_size(WINDOW_WIDTH, WINDOW_HEIGHT)
+        .inner_size(WINDOW_WIDTH as f64, WINDOW_HEIGHT as f64)
         .resizable(false)
         .fullscreen(false)
         .decorations(false)
@@ -87,18 +94,18 @@ mod tests {
 
     #[test]
     fn window_size_constants_are_positive() {
-        assert!(WINDOW_WIDTH > 0.0);
-        assert!(WINDOW_HEIGHT > 0.0);
+        assert!(WINDOW_WIDTH > 0);
+        assert!(WINDOW_HEIGHT > 0);
     }
 
     #[test]
     fn fixed_window_size_matches_constants() {
         let size = fixed_window_size();
-        if let Size::Logical(logical) = size {
-            assert_eq!(logical.width, WINDOW_WIDTH);
-            assert_eq!(logical.height, WINDOW_HEIGHT);
+        if let Size::Physical(physical) = size {
+            assert_eq!(physical.width, WINDOW_WIDTH);
+            assert_eq!(physical.height, WINDOW_HEIGHT);
         } else {
-            panic!("expected logical size");
+            panic!("expected physical size");
         }
     }
 

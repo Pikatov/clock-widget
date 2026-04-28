@@ -1,4 +1,4 @@
-const { appWindow, LogicalSize, WebviewWindow } = window.__TAURI__.window;
+const { appWindow } = window.__TAURI__.window;
 
 const WINDOW_WIDTH = 336;
 const WINDOW_HEIGHT = 296;
@@ -196,9 +196,13 @@ const state = {
   pinned: loadBool(STORAGE_KEYS.pinned, false),
   timeZone: loadString(STORAGE_KEYS.timeZone, safeResolvedTimeZone() || 'UTC'),
   widgetStyle: loadString(STORAGE_KEYS.style, 'classic'),
-  sizeSyncScheduled: false,
+  dpiScaleSyncScheduled: false,
+  uiZoom: 1,
   filteredZones: [],
 };
+
+document.documentElement.style.setProperty('--window-width', `${WINDOW_WIDTH}px`);
+document.documentElement.style.setProperty('--window-height', `${WINDOW_HEIGHT}px`);
 
 // --- Theme ---
 
@@ -214,6 +218,26 @@ function setWidgetStyle(nextStyle) {
   saveString(STORAGE_KEYS.style, nextStyle);
   applyTheme();
   refreshMenuLabels();
+}
+
+function currentScaleFactor() {
+  const scaleFactor = window.devicePixelRatio || 1;
+  return Number.isFinite(scaleFactor) && scaleFactor > 0 ? scaleFactor : 1;
+}
+
+function applyDpiScale() {
+  state.uiZoom = 1 / currentScaleFactor();
+  document.body.style.zoom = `${state.uiZoom}`;
+}
+
+function scheduleDpiScaleSync() {
+  if (state.dpiScaleSyncScheduled) return;
+  state.dpiScaleSyncScheduled = true;
+
+  requestAnimationFrame(() => {
+    state.dpiScaleSyncScheduled = false;
+    applyDpiScale();
+  });
 }
 
 async function applyWindowMode() {
@@ -287,29 +311,10 @@ function updateClock() {
     `Time zone: ${state.timeZone}${tzOffset ? ` (${tzOffset})` : ''}`;
 }
 
-// --- Window size sync ---
-
-async function syncWindowSize() {
-  try {
-    await appWindow.setSize(new LogicalSize(WINDOW_WIDTH, WINDOW_HEIGHT));
-  } catch (error) {
-    console.error('Failed to sync window size', error);
-  }
-}
-
-function scheduleWindowSizeSync() {
-  if (state.sizeSyncScheduled) return;
-  state.sizeSyncScheduled = true;
-
-  requestAnimationFrame(async () => {
-    state.sizeSyncScheduled = false;
-    await syncWindowSize();
-  });
-}
-
 // --- Context menu ---
 
 function showContextMenu() {
+  const zoom = state.uiZoom || 1;
   const widgetRect = widget.getBoundingClientRect();
   ctxMenu.classList.add('show');
   ctxMenu.style.visibility = 'hidden';
@@ -317,18 +322,30 @@ function showContextMenu() {
   ctxMenu.style.top = '0px';
 
   const menuRect = ctxMenu.getBoundingClientRect();
-  const left = widgetRect.left + (widgetRect.width - menuRect.width) / 2;
+  const widgetBox = {
+    left: widgetRect.left / zoom,
+    top: widgetRect.top / zoom,
+    width: widgetRect.width / zoom,
+    bottom: widgetRect.bottom / zoom,
+  };
+  const menuBox = {
+    width: menuRect.width / zoom,
+    height: menuRect.height / zoom,
+  };
+  const viewportWidth = window.innerWidth / zoom;
+  const viewportHeight = window.innerHeight / zoom;
+  const left = widgetBox.left + (widgetBox.width - menuBox.width) / 2;
   const gap = 10;
-  const spaceAbove = widgetRect.top - gap;
-  const spaceBelow = window.innerHeight - widgetRect.bottom - gap;
-  const prefersBelow = spaceBelow >= menuRect.height || spaceBelow > spaceAbove;
+  const spaceAbove = widgetBox.top - gap;
+  const spaceBelow = viewportHeight - widgetBox.bottom - gap;
+  const prefersBelow = spaceBelow >= menuBox.height || spaceBelow > spaceAbove;
   const top = prefersBelow
-    ? widgetRect.bottom + gap
-    : widgetRect.top - menuRect.height - gap;
+    ? widgetBox.bottom + gap
+    : widgetBox.top - menuBox.height - gap;
 
   ctxMenu.scrollTop = 0;
-  ctxMenu.style.left = `${clamp(left, 10, window.innerWidth - menuRect.width - 10)}px`;
-  ctxMenu.style.top = `${clamp(top, 10, window.innerHeight - menuRect.height - 10)}px`;
+  ctxMenu.style.left = `${clamp(left, 10, viewportWidth - menuBox.width - 10)}px`;
+  ctxMenu.style.top = `${clamp(top, 10, viewportHeight - menuBox.height - 10)}px`;
   ctxMenu.style.visibility = '';
 }
 
@@ -419,32 +436,8 @@ document.addEventListener('click', (event) => {
 });
 
 bindMenuAction('addWidget', async () => {
-  // Separate inner try so a position failure still creates the widget with a safe fallback.
-  let x = 80;
-  let y = 80;
   try {
-    const pos = await appWindow.outerPosition();
-    x = pos.x + 28;
-    y = pos.y + 28;
-  } catch (_) {}
-
-  try {
-    const label = `widget-${Date.now()}`;
-    new WebviewWindow(label, {
-      url: 'index.html',
-      title: 'Clock Widget',
-      width: WINDOW_WIDTH,
-      height: WINDOW_HEIGHT,
-      resizable: false,
-      fullscreen: false,
-      decorations: false,
-      transparent: true,
-      alwaysOnTop: false,
-      skipTaskbar: true,
-      focus: true,
-      x,
-      y,
-    });
+    await window.__TAURI__.tauri.invoke('create_widget');
   } catch (error) {
     console.error('Failed to create widget', error);
   }
@@ -539,14 +532,14 @@ document.addEventListener('keydown', (event) => {
 
 window.addEventListener('resize', () => {
   ctxMenu.classList.remove('show');
-  scheduleWindowSizeSync();
+  scheduleDpiScaleSync();
 });
 
 // --- Init ---
 
+scheduleDpiScaleSync();
 applyTheme();
 refreshMenuLabels();
-scheduleWindowSizeSync();
 applyWindowMode();
 updateClock();
 renderTzList();
