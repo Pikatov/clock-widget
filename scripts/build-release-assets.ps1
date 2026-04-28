@@ -24,6 +24,32 @@ function Assert-Command([string]$name, [string]$hint) {
   }
 }
 
+function Get-ReleaseExe([string]$root) {
+  $releaseDir = Join-Path $root "target\release"
+  $knownNames = @(
+    "clock-widget.exe",
+    "Clock Widget.exe",
+    "ClockWidget.exe"
+  )
+
+  foreach ($name in $knownNames) {
+    $candidate = Join-Path $releaseDir $name
+    if (Test-Path $candidate) {
+      return $candidate
+    }
+  }
+
+  $exe = Get-ChildItem -Path $releaseDir -Filter "*.exe" -File -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
+
+  if ($exe) {
+    return $exe.FullName
+  }
+
+  throw "Release executable was not found in: $releaseDir"
+}
+
 $root = Get-ProjectRoot
 Push-Location $root
 
@@ -56,10 +82,8 @@ try {
 
   Copy-Item -Force $msi.FullName (Join-Path $out $msi.Name)
 
-  $exe = Join-Path $root "target\release\clock-widget.exe"
-  if (-not (Test-Path $exe)) {
-    throw "Release executable was not found at: $exe"
-  }
+  $exe = Get-ReleaseExe $root
+  Write-Host "Using release executable: $exe"
 
   $zipName = "ClockWidget-$version-portable-win11.zip"
   $zipPath = Join-Path $out $zipName
