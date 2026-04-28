@@ -5,7 +5,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Get-ProjectRoot {
-  $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+  $here = $PSScriptRoot
+  if (-not $here) {
+    $here = Split-Path -Parent $PSCommandPath
+  }
   return (Resolve-Path (Join-Path $here "..")).Path
 }
 
